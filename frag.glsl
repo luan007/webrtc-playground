@@ -3,7 +3,7 @@ uniform float iGlobalTime;
 uniform sampler2D iChannel0;
 uniform vec2 iResolution;
 varying vec2 vUv;
-const float t = 0.03;
+const float t = 0.1;
 uniform float ax[16];
 uniform float ay[16];
 
@@ -34,7 +34,7 @@ float corner(in vec2 fragCoord)
     bool darker = true;
     bool brighter = true;
 
-    for (float j = 0.0; j < 9.0; j++)
+    for (float j = 0.0; j < 10.0; j++)
     {
       float cx = ax[int(mod((i + j), 15.0))];
       float cy = ay[int(mod((i + j), 15.0))];
@@ -72,5 +72,7 @@ void main(void)
 {
   vec2 fragCoord = vUv.xy * iResolution.xy;
   float g = corner(fragCoord);
-  gl_FragColor = vec4(g, g, g, 1.0);
+  // gl_FragColor = vec4(g, g, g, 1.0);
+  gl_FragColor = texture2D(iChannel0, vUv.xy);
+  
 }

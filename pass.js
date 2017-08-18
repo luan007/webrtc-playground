@@ -1,4 +1,4 @@
-function pass(renderer, camera, fshader, vshader, uniform) {
+function pass(renderer, camera, fshader, vshader, uniform, doSWAP) {
   var scene = new THREE.Scene();
   var target = new THREE.WebGLRenderTarget(
     window.innerWidth,
@@ -19,12 +19,16 @@ function pass(renderer, camera, fshader, vshader, uniform) {
   var obj = {
     uniform: uniform,
     target: target,
+    prev: target,
     render: function() {
-      b = !b;
-      var swap = target;
-      target = target2;
-      target2 = swap;
-      obj.target = target;
+      if (doSWAP) {
+        b = !b;
+        var swap = target;
+        target = target2;
+        target2 = swap;
+        obj.target = target;
+        obj.prev = target2;
+      }
       renderer.render(scene, camera, target);
     }
   };

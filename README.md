@@ -8,3 +8,4 @@ prep work for iOS11 - 2018
 
 - still have no idea how to choose front/rear cam in code. d[1] -> rear, d[2] -> front, for now (iOS6s plus).
 
+- TBC

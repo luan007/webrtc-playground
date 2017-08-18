@@ -1,0 +1,19 @@
+{
+  "name": "webrtc-playground",
+  "version": "1.0.0",
+  "description": "prep work for iOS11 - 2018",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luan007/webrtc-playground.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luan007/webrtc-playground/issues"
+  },
+  "homepage": "https://github.com/luan007/webrtc-playground#readme"
+}

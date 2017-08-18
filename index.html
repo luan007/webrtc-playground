@@ -1,0 +1,52 @@
+<html>
+
+<head>
+    <title></title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 100%;
+            width: 100%;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <video playsinline id='video'></video>
+    <!-- <button onclick='play()'>fuckin play</button> -->
+    <script>
+        var video = document.querySelector("#video");
+        navigator.mediaDevices
+            .enumerateDevices()
+            .then(function (d) {
+                navigator.mediaDevices.getUserMedia(
+                    {
+                        video: {
+                            deviceId: { exact: d[1].deviceId }
+                        }
+                    },
+                ).then(function (stream) {
+                    video.srcObject = stream;
+                    video.play();
+                }).catch(function (e) {
+                    alert(e);
+                });
+            })
+            .catch(function () {
+                // alert("Device Enum Err");
+            });
+    </script>
+</body>
+
+</html>

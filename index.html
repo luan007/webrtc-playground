@@ -50,7 +50,7 @@
                 navigator.mediaDevices.getUserMedia(
                     {
                         video: {
-                            deviceId: { exact: d[1].deviceId }
+                            // deviceId: { exact: d[1].deviceId }
                         }
                     },
                 ).then(function (stream) {
@@ -86,23 +86,14 @@
 
             scene = new THREE.Scene();
 
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-            camera.position.z = 1000;
+            camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
-            geometry = new THREE.BoxGeometry(200, 200, 200);
-            material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
-
-            mesh = new THREE.Mesh(geometry, material);
-            scene.add(mesh);
-
-            renderer = new THREE.WebGLRenderer();
+            renderer = new THREE.WebGLRenderer({
+                antialias: true
+            });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(devicePixelRatio);
             document.body.appendChild(renderer.domElement);
-
-
-
-
 
             var vshader = `
                 varying vec2 vUv; 
@@ -113,7 +104,6 @@
                     gl_Position = projectionMatrix * mvPosition;
                 }
                 `;
-
 
             var fshader = `
             
@@ -142,14 +132,7 @@
             float corner ( in vec2 fragCoord ) {
                 float x = fragCoord.x;
                 float y = fragCoord.y;
-                
-                
-                //blur
-                
-                
-                
-                //vec4 cur = texture(iChannel0, fragCoord.xy / iResolution.xy);
-                
+
                 float b = (ggray(vec2(x, y))
                            + ggray(vec2(1.0 + x, y))
                            + ggray(vec2(x - 1.0, y))
@@ -194,45 +177,34 @@
                 float g = corner(fragCoord);
                 gl_FragColor = vec4(g, g, g, 1.0);
             }
-            
-            
                 `;
 
             var vtexture = new THREE.VideoTexture(video);
-            vtexture.minFilter = THREE.LinearFilter;
-            vtexture.magFilter = THREE.LinearFilter;
+            vtexture.minFilter = THREE.NearestFilter;
+            vtexture.magFilter = THREE.NearestFilter;
             vtexture.format = THREE.RGBFormat;
 
             var tuniform = {
                 iGlobalTime: { type: 'f', value: 0.1 },
                 iChannel0: { type: 't', value: vtexture },
-                iResolution: { type: 'v2', value: new THREE.Vector2(video.videoWidth , video.videoHeight) },
-                ax : { type: "fv", value: [0.0,   1.0,  2.0,  3.0, 3.0, 3.0, 2.0, 1.0, 0.0, -1.0, -2.0, -3.0, -3.0, -3.0, -2.0, -1.0] },
-                ay : { type: "fv", value: [-3.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 3.0,  3.0,  2.0,  1.0,  0.0, -1.0, -2.0, -3.0] },
+                iResolution: { type: 'v2', value: new THREE.Vector2(video.videoWidth, video.videoHeight) },
+                ax: { type: "fv", value: [0.0, 1.0, 2.0, 3.0, 3.0, 3.0, 2.0, 1.0, 0.0, -1.0, -2.0, -3.0, -3.0, -3.0, -2.0, -1.0] },
+                ay: { type: "fv", value: [-3.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 3.0, 3.0, 2.0, 1.0, 0.0, -1.0, -2.0, -3.0] },
             };
             // tuniform.iChannel0.value.wrapS = tuniform.iChannel0.value.wrapT = THREE.ClamE;
             var mat = new THREE.ShaderMaterial({
                 uniforms: tuniform,
                 vertexShader: vshader,
                 fragmentShader: fshader,
-                side: THREE.DoubleSide
             });
 
-            var tobject = new THREE.Mesh(new THREE.PlaneGeometry(video.videoWidth, video.videoHeight, 1, 1), mat);
+            var tobject = new THREE.Mesh(new THREE.PlaneGeometry( 2, 2 ), mat);
             scene.add(tobject);
-
-
         }
 
         function animate() {
-
             requestAnimationFrame(animate);
-
-            mesh.rotation.x += 0.01;
-            mesh.rotation.y += 0.02;
-
             renderer.render(scene, camera);
-
         }
     </script>
 </body>

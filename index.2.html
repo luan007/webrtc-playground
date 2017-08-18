@@ -1,0 +1,99 @@
+<html>
+
+<head>
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script src='./tracking.min.js'></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        video,
+        canvas {
+            visibility: collapse;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: block;
+            height: 100%;
+            width: 100%;
+        }
+
+        canvas {
+            visibility: visible;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <video playsinline id='video'></video>
+    <canvas id='canvas'></canvas>
+    <!-- <button onclick='play()'>fuckin play</button> -->
+    <script>
+        var video = document.querySelector("#video");
+        navigator.mediaDevices
+            .enumerateDevices()
+            .then(function (d) {
+                navigator.mediaDevices.getUserMedia(
+                    {
+                        video: {
+                            // deviceId: { exact: d[1].deviceId }
+                        }
+                    },
+                ).then(function (stream) {
+                    video.srcObject = stream;
+                    video.play();
+                }).catch(function (e) {
+                    alert(e);
+                });
+            })
+            .catch(function () {
+                // alert("Device Enum Err");
+            });
+
+        var ctx = canvas.getContext('2d');
+
+
+        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+        // var raf = function () {
+        //     requestAnimationFrame(raf);
+        //     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        //     ctx.drawImage(video, 0, 0);
+        //     doFindFeatures();
+        // }
+        // raf();
+        var FastTracker = function () {
+            FastTracker.base(this, 'constructor');
+        };
+        tracking.inherits(FastTracker, tracking.Tracker);
+        tracking.Fast.THRESHOLD = 2;
+        FastTracker.prototype.threshold = tracking.Fast.THRESHOLD;
+        FastTracker.prototype.track = function (pixels, width, height) {
+            var gray = tracking.Image.grayscale(pixels, width, height);
+            var corners = tracking.Fast.findCorners(gray, width, height);
+            this.emit('track', {
+                data: corners
+            });
+        };
+        var tracker = new FastTracker();
+        tracker.on('track', function (event) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            var corners = event.data;
+            for (var i = 0; i < corners.length; i += 2) {
+                ctx.fillStyle = '#f00';
+                ctx.fillRect(corners[i], corners[i + 1], 2, 2);
+            }
+        });
+        tracking.track('#video', tracker, { camera: true });
+    </script>
+</body>
+
+</html>
